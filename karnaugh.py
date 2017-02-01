@@ -141,15 +141,15 @@ def blocoEmTexto(bloco):
   # para cada bit do bloco
   
   for i in sorted(bloco):
-    sufixo = " "
-#    prefixo = ""
+#    sufixo = " "
+    prefixo = ""
     # se o valor do bit é 0, adicione a barra
     #if not bloco[i]: sufixo = u"\u0305"
-    if not bloco[i]: sufixo = u"'"
-#    if not bloco[i]: prefixo = u"~"
+#    if not bloco[i]: sufixo = u"'"
+    if not bloco[i]: prefixo = u"/"
     # adicione a variavel
-    f.append(chr(char_a+i) + sufixo)
-#    f.append(prefixo+chr(char_a+i))
+#    f.append(chr(char_a+i) + sufixo)
+    f.append(prefixo+chr(char_a+i))
   if len(f) == 0 : return u"1"
   return "".join(f)
 
@@ -296,7 +296,7 @@ def funcaoEmIndices(s,bits):
   import re
   s = s.upper()
   # Se contem caracteres invalidos, aborte
-  if re.search("[^A-Z +']",s):
+  if re.search("[^A-Z +/]",s):
     raise Exception("Funcao contem caracteres invalidos")
   tabela = []
   bits = max(ord(max(s))-ord('A')+1,bits)
@@ -307,7 +307,7 @@ def funcaoEmIndices(s,bits):
   for b in s.split("+"):
     r = 0;
     # para cada letra+negacao do bloco
-    bloco = map(str.strip,re.findall("(?:[A-Z](?: |')?)",b))
+    bloco = map(str.strip,re.findall("(?: |[/])?(?:[A-Z])",b))
     utilizar_bloco = True
     for variavel in bloco:
       # Se a variavel contem a negacao, seu tamanho é 2
