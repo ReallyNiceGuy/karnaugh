@@ -296,7 +296,7 @@ def funcaoEmIndices(s,bits):
   import re
   s = s.upper()
   # Se contem caracteres invalidos, aborte
-  if re.search("[^A-Z +/]",s):
+  if re.search("[^A-Z +/.]",s):
     raise Exception("Funcao contem caracteres invalidos")
   tabela = []
   bits = max(ord(max(s))-ord('A')+1,bits)
@@ -307,7 +307,7 @@ def funcaoEmIndices(s,bits):
   for b in s.split("+"):
     r = 0;
     # para cada letra+negacao do bloco
-    bloco = map(str.strip,re.findall("(?: |[/])?(?:[A-Z])",b))
+    bloco = map(lambda x: str.strip(x," ."),re.findall("(?: |[/.])?(?:[A-Z])",b))
     utilizar_bloco = True
     for variavel in bloco:
       # Se a variavel contem a negacao, seu tamanho é 2
