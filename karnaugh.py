@@ -5,6 +5,7 @@ if not "raw_input" in dir(__builtins__):
   raw_input = input
 
 def blocoToValue(b):
+  if not len(b): return []
   r = []
   for k in range(max(b.keys())+1):
     if k in b.keys():
