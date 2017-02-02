@@ -1,6 +1,18 @@
 #!/usr/bin/python
 # -- encoding: utf-8 --
 
+if not "raw_input" in dir(__builtins__):
+  raw_input = input
+
+def blocoToValue(b):
+  r = []
+  for k in range(max(b.keys())+1):
+    if k in b.keys():
+      r.append(int(b[k]))
+    else:
+      r.append(-1)
+  return r
+
 '''
   A simplificação de função booleana pelo método de Karnaugh se baseia no
 agrupamento dos bits com valor Verdadeiro em blocos 'vizinhos'.
@@ -117,7 +129,7 @@ def numeroMinimoDeBits(valores,irrelevante,fixo=0):
   if bits < 1 : bits = 1
   if fixo:
     if fixo<bits:
-      print "Numero de variaveis requisitado '%d' nao eh suficiente para definir a funcao, utilizando '%d' variaveis" % (fixo,bits)
+      print( "Numero de variaveis requisitado '%d' nao eh suficiente para definir a funcao, utilizando '%d' variaveis" % (fixo,bits) )
       return bits
     else:
       return fixo
@@ -156,7 +168,7 @@ def blocoEmTexto(bloco):
 def funcaoEmTexto(funcao):
   ret = []
   # para cada bloco da funcao
-  for bloco in sorted(funcao):
+  for bloco in sorted(funcao,key=blocoToValue):
     # converte para texto
     ret.append(blocoEmTexto(bloco))
   
@@ -177,7 +189,7 @@ def calcularPeso(testados,irrelevante,vetores):
 
 def agrupar(testados,tabela,irrelevante,vetores,identacao=">"):
   otimo = False
-  if TRACE: print identacao+"Vetores originais", vetores
+  if TRACE: print( identacao+"Vetores originais", vetores )
   # pegar os vizinhos da lista de indices
   blocos = vizinhos(vetores)
   # inicialize o maior bloco com os vetores originais
@@ -188,27 +200,27 @@ def agrupar(testados,tabela,irrelevante,vetores,identacao=">"):
   peso = 0 
   # para cada bloco de vizinhos
   for bloco in blocos:
-    if TRACE: print identacao+"Testando vizinho", bloco
+    if TRACE: print( identacao+"Testando vizinho", bloco )
     encontrado = True
     # para cada vizinho
     for v in bloco:
       # verifique se o indice existe na tabela
       indice = vetorEmIndice(v)
       if not (indice in tabela or indice in irrelevante):
-        if TRACE: print identacao+" Falhou"
+        if TRACE: print( identacao+" Falhou" )
         # nao existe o indice, vizinho inválido, tente o próximo
         encontrado = False
         break;
     # se todos os items foram 1
     if encontrado:
       # tente agrupar mais um nível
-      if TRACE: print identacao+" Funcionou, testar um nivel acima"
+      if TRACE: print( identacao+" Funcionou, testar um nivel acima" )
       bloco_encontrado,otimo = agrupar(testados,tabela,irrelevante,vetores+list(bloco),identacao+">")
       # Calcular peso do bloco_encontrado
       novo_peso = calcularPeso(testados,irrelevante,bloco_encontrado)
       # se o novo bloco é maior que o original ou se o peso do novo bloco é maior substitua
       if (len(bloco_encontrado) > len(maior_bloco) or (len(bloco_encontrado) == len(maior_bloco) and novo_peso > peso)):
-        if TRACE and peso > 0: print (identacao+" Melhor bloco encontrado com peso %d, (anterior era %d), substituindo") % (novo_peso,peso)
+        if TRACE and peso > 0: print( (identacao+" Melhor bloco encontrado com peso %d, (anterior era %d), substituindo") % (novo_peso,peso))
         maior_bloco = bloco_encontrado
         peso = novo_peso
         
@@ -226,7 +238,7 @@ def agrupar(testados,tabela,irrelevante,vetores,identacao=">"):
       if (len(vetores) == (1 << (len(vetores[0])-1))):
         otimo = True
 
-  if TRACE: print identacao+"Maior bloco encontrado" , maior_bloco, ", peso %d" % calcularPeso(testados,irrelevante,maior_bloco)
+  if TRACE: print( identacao+"Maior bloco encontrado" , maior_bloco, ", peso %d" % calcularPeso(testados,irrelevante,maior_bloco) )
   return (maior_bloco,otimo)
 
 # Tabela contém os itens que são 1
@@ -243,7 +255,7 @@ def simplificar(tabela,irrelevante,bits=0):
   for i in tabela:
     if not i in testados.keys():
       # agrupe os valores 1, se a entrada ainda não foi utilizada antes
-      if TRACE: print "Testando entrada da tabela"
+      if TRACE: print( "Testando entrada da tabela" )
       g,_ = agrupar(testados,tabela,irrelevante,[ indiceEmVetor(i,numbits) ])
       # minimize e adicione o bloco na lista de funcoes
       funcao.append(criarBloco(g))
@@ -263,7 +275,7 @@ def avaliar(funcao, indice,bits):
   valor = 0
   for bloco in funcao:
     valor_bloco = 1
-    for i in reversed(bloco.keys()):
+    for i in reversed(list(bloco.keys())):
       if i>=numbits:
         valor_bloco = valor_bloco and (0 == bloco[i])
       else:
@@ -282,7 +294,7 @@ def validar(tabela,irrelevante,bits=0):
     if not (i in irrelevante):
       v = avaliar(f,i,numbits)
       if ((i in tabela and v != 1) or ( not (i in tabela) and v == 1 ) ):
-        print "Falhou na validação: indice",i
+        print( "Falhou na validação: indice",i )
         return []
   return f
 
@@ -385,7 +397,7 @@ if __name__ == "__main__":
       reverse = False
     bits = int(raw_input("Numero de variaveis: "))
     if (bits<1):
-      print "Entrada invalida"
+      print( "Entrada invalida" )
       exit(1)
 
     for j in range(1<<bits):
@@ -403,10 +415,10 @@ if __name__ == "__main__":
         elif n == '0':
           pass
         else:
-          print "Entrada invalida"
+          print( "Entrada invalida")
           ok=False
 
   bits = numeroMinimoDeBits(tabela,irrelevante,bits)
-  print "%s \"%s\" \"%s\" %d" % (sys.argv[0],",".join(map(str,tabela)), ",".join(map(str,irrelevante)), bits )
-  print funcaoEmTexto(validar(sorted(tabela),irrelevante,bits))
+  print( "%s \"%s\" \"%s\" %d" % (sys.argv[0],",".join(map(str,tabela)), ",".join(map(str,irrelevante)), bits ))
+  print( funcaoEmTexto(validar(sorted(tabela),irrelevante,bits)))
 
