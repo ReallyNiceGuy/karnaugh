@@ -318,7 +318,7 @@ def funcaoEmIndices(s,bits):
       idx = ord(variavel[0]) - ord('A')
 
       # caso variavel e variavel' seja definido, esse bloco é sempre zero
-      if variavel+"'" in bloco:
+      if "/"+variavel in bloco:
         utilizar_bloco = False
         break
 
