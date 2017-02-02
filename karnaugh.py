@@ -10,7 +10,7 @@ def blocoToValue(b):
     if k in b.keys():
       r.append(int(b[k]))
     else:
-      r.append(-1)
+      r.append(3)
   return r
 
 '''
