@@ -363,63 +363,79 @@ if __name__ == "__main__":
   bits=0
   tabela=[]
   irrelevante=[]
-  if (len(sys.argv) > 1):
-    if len(sys.argv)>3: bits=int(sys.argv[3])
-    while(True):
-      try:
-        tabela = sys.argv[1].split(",")
-        if len(tabela) == 1 and tabela[0].strip() == '':
-          tabela = []
-        else:
-          tabela=[int(x,0) for x in tabela]
-      except:
-        tabela, bits = funcaoEmIndices(sys.argv[1], bits)
+  usage = '''Sintaxe: %s [tabela [irrelevante [bits]] | --help ]
 
-      if (len(sys.argv)>2):
-        try:
-          ibits = bits
-          irrelevante = sys.argv[2].split(",")
-          if len(irrelevante) == 1 and irrelevante[0].strip() == '':
-            irrelevante = []
-          else:
-            irrelevante =[int(x,0) for x in irrelevante]
-        except:
-          irrelevante, ibits=funcaoEmIndices(sys.argv[2],bits)
-        if (bits == ibits):
-          break
-        else:
-          bits = max(ibits,bits)
-      else:
-        break
+'tabela' determina os índices onde o resultado da funçao ten que ser true.
+'irrelevante' determina os índices onde o resultado da funçao é irrelevante.
+'bits' define o número de bits que a funçao contém. Se não for fornecido,
+  definirase a partir de 'tabela' e 'irrelevante'.
+'-h' ou '--help' mostra esta ajuda.
 
+Os argumentos 'tabela' e 'irrelevante' podem ser uma lista de índices ou uma 
+  funçao. Exemplos: '0,2,3', '/A/B+/AB+AB'.
+Se nemhum argumento for fornecido, a tabela de verdade será solicitada de forma
+  interativa.''' % sys.argv[0]
+
+  if len(sys.argv)==2 and (sys.argv[1]=='-h' or sys.argv[1]=='--help'):
+    print( usage )
   else:
-    reverse = True
-    if len(sys.argv)>1 and sys.argv[1] == "A=lsb":
-      reverse = False
-    bits = int(raw_input("Numero de variaveis: "))
-    if (bits<1):
-      print( "Entrada invalida" )
-      exit(1)
+    if (len(sys.argv) > 1):
+      if len(sys.argv)>3: bits=int(sys.argv[3])
+      while(True):
+        try:
+          tabela = sys.argv[1].split(",")
+          if len(tabela) == 1 and tabela[0].strip() == '':
+            tabela = []
+          else:
+            tabela=[int(x,0) for x in tabela]
+        except:
+          tabela, bits = funcaoEmIndices(sys.argv[1], bits)
 
-    for j in range(1<<bits):
-      i = j
-      if reverse:
-        i=reverseBits(j,bits)
-      ok = False
-      while(not ok):
-        ok=True
-        n=raw_input("Entre o valor para "+blocoEmTexto(criarBloco([indiceEmVetor(i,bits)]))+": ")
-        if n == 'x' or n == 'X' or n == '.':
-          irrelevante.append(i)
-        elif n == '1':
-          tabela.append(i)
-        elif n == '0':
-          pass
+        if (len(sys.argv)>2):
+          try:
+            ibits = bits
+            irrelevante = sys.argv[2].split(",")
+            if len(irrelevante) == 1 and irrelevante[0].strip() == '':
+              irrelevante = []
+            else:
+              irrelevante =[int(x,0) for x in irrelevante]
+          except:
+            irrelevante, ibits=funcaoEmIndices(sys.argv[2],bits)
+          if (bits == ibits):
+            break
+          else:
+            bits = max(ibits,bits)
         else:
-          print( "Entrada invalida")
-          ok=False
+          break
 
-  bits = numeroMinimoDeBits(tabela,irrelevante,bits)
-  print( "%s \"%s\" \"%s\" %d" % (sys.argv[0],",".join(map(str,tabela)), ",".join(map(str,irrelevante)), bits ))
-  print( funcaoEmTexto(validar(sorted(tabela),irrelevante,bits)))
+    else:
+      reverse = True
+      if len(sys.argv)>1 and sys.argv[1] == "A=lsb":
+        reverse = False
+      bits = int(raw_input("Numero de variaveis: "))
+      if (bits<1):
+        print( "Entrada invalida" )
+        exit(1)
+
+      for j in range(1<<bits):
+        i = j
+        if reverse:
+          i=reverseBits(j,bits)
+        ok = False
+        while(not ok):
+          ok=True
+          n=raw_input("Entre o valor para "+blocoEmTexto(criarBloco([indiceEmVetor(i,bits)]))+": ")
+          if n == 'x' or n == 'X' or n == '.':
+            irrelevante.append(i)
+          elif n == '1':
+            tabela.append(i)
+          elif n == '0':
+            pass
+          else:
+            print( "Entrada invalida")
+            ok=False
+
+    bits = numeroMinimoDeBits(tabela,irrelevante,bits)
+    print( "%s \"%s\" \"%s\" %d" % (sys.argv[0],",".join(map(str,tabela)), ",".join(map(str,irrelevante)), bits ))
+    print( funcaoEmTexto(validar(sorted(tabela),irrelevante,bits)))
 
